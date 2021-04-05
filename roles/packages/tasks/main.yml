@@ -1,0 +1,12 @@
+---
+# tasks file for roles/packages
+
+- name: Install Chocolatey packages
+  win_chocolatey:
+    "{{ item }}"
+  with_items: "{{ chocolatey }}"
+
+- name: Install PSModules
+  win_psmodule:
+    "{{ item }}"
+  with_items: "{{ psmodule }}"
