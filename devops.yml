@@ -1,0 +1,9 @@
+# Playbook template for DevOps role, with the corresponding tasks
+
+- hosts: localhost
+  roles:
+    - packages
+    - role: env_vars
+      vars:
+        variables:
+          - ASPNETCORE_ENVIRONMENT: dev
