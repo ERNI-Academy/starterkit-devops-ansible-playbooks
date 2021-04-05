@@ -1,0 +1,13 @@
+---
+# tasks file for roles/folders
+
+- name: Create directory structure
+  win_file:
+    path: "{{ item }}"
+    state: directory
+  with_items: "{{ folders }}"
+
+- name: Add LocCms allow rights
+  win_acl:
+    "{{ item }}"
+  with_items: "{{ users }}"

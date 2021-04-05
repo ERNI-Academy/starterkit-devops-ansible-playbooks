@@ -1,0 +1,13 @@
+---
+# defaults file for roles/folders
+
+folders:
+    - 'C:\Users\AnsibleExample'
+users:
+    - path: C:\Users
+      user: ERNI\maat
+      rights: FullControl
+      type: allow
+      state: present
+      inherit: ContainerInherit, ObjectInherit
+      propagation: 'InheritOnly'
