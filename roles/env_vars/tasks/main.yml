@@ -1,0 +1,10 @@
+---
+# tasks file for roles/env_vars
+
+- name: Set environment variables for all users
+  win_environment:
+    state: present
+    name:  "{{ item.key }}"
+    value: "{{ item.value }}"
+    level: machine
+  with_dict: "{{ variables }}"

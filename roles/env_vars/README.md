@@ -11,6 +11,7 @@ Requirements
 
 A Windows host, tested in:
 - `Windows Server 2019`
+- `Windows 10`
 
 Role Variables
 --------------

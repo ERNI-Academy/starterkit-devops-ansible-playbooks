@@ -1,0 +1,5 @@
+---
+# defaults file for roles/env_vars
+
+variables:
+    - ASPNETCORE_ENVIRONMENT: dev  
