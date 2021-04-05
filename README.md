@@ -1,38 +1,169 @@
-# About {{ Name }}
-ERNI Academy StarterKit, PoC, or Gidelines. This is an about description of your repository.
+# starterkit-devops-ansible-playbooks
+Post Windows installation playbooks for different Windows environments.
 
 ## Built With
-This section should list any major frameworks that you built your project using. Leave any add-ons/plugins for the acknowledgements section. Here are a few examples.
+The main tools this repository will use are:
 
-- [Tools A](https://example.com)
-- [Framework B](https://example.com)
-- [Project C](https://example.com)
+- [Ansible](https://docs.ansible.com), a tool that connects to the Windows machines using winRM protocol
+- [WSL](https://docs.microsoft.com/en-us/windows/wsl/install-win10), as Ansible just works in Unix machines
+- [Chocolatey](https://chocolatey.org), a Windows package manager.
 
 # Features
-- Be awesome
-- Make things faster
+- Ansible is a tool that manages the configuration of any host/server. It also handles states, so once a machine is configured using Ansible, any software and/or configuration MUST BE done through the playbook process (even configuration and/or application removal). This allows to have every transaction in the git repository, and avoids configuration drifts.
+- Will speed-up the ramp-up role for your project
 
 # Getting Started
-This is an example of how you may give instructions on setting up your project locally. To get a local copy up and running follow these simple example steps.
+In the following section you will find out how to setup your enviroment so that later on you are able to clone this repository and run your playbooks.
 
 ## Prerequisites
-This is an example of how to list things you need to use the software and how to install them.
+Ansible works also under Windows Subsystem for Linux (WSL). Follow this guide to install it in Windows 10: https://docs.microsoft.com/en-us/windows/wsl/install-win10
 
 ## Installation
-Installation instructions {{ Name }} by running:
 
-1. Clone the repo
-   ```sh 
-   git clone https://github.com/ERNI-Academy/Project-Name.git
-   ```
-2. Install packages
-    ```sh
-    npm install
-    ```
-3. Configure
-    ```JS
-    const API_KEY = 'ENTER YOUR API';
-    ```
+### Prepare the host where to run the Playbook
+
+In both hosts the approach is the same but it uses different commands. Requirements are:
+- python3 
+
+#### Debian 10 WSL
+
+Install python 3 and pip (python package manager) if not existing:
+
+```
+sudo apt-get update
+sudo apt-get install python3 python3-pip -y
+```
+
+Start installing all the packages needed for running ansible against the windows hosts. You will need to install:
+
+- ansible
+- pywinrm
+- pywinrm[credssp]
+
+```
+pip3 install ansible
+pip3 install pywinrm
+pip3 install pywinrm[credssp]
+```
+
+Make sure Ansible is installed by running:
+
+```
+ansible --version
+```
+### Prepare a Windows host to apply the recipe locally from WSL
+
+To enable your Windows environment to be configured locally by using Ansible from WSL, you will need to follow the next steps:
+
+```
+# Configure Remoting for Ansible 
+iex ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/ConfigureRemotingForAnsible.ps1'))
+# Enable WsMan
+Enable-WSManCredSSP -Role Server -Force
+```
+After that, you should be able to connect from your WSL by using `localhost`
+
+## Structure
+
+The playbooks are organized as follows:
+```
+├── roles
+│   ├── packages
+│   │   ├── defaults
+│   │   │   └── main.yml
+│   │   ├── files
+│   │   ├── handlers
+│   │   │   └── main.yml
+│   │   ├── meta
+│   │   │   └── main.yml
+│   │   ├── README.md
+│   │   ├── tasks
+│   │   │   └── main.yml
+│   │   ├── templates
+│   │   ├── tests
+│   │   │   ├── inventory
+│   │   │   └── test.yml
+│   │   └── vars
+│   │       └── main.yml
+│   ├── folders
+│   ├── users_management
+│   └── env_vars
+├── devops.yml
+├── hosts.yml
+└── README.md
+
+```
+There is 1 main folder, and sub-groups inside it:
+- `roles`: where tasks and variables related to the group of tasks are defined.
+
+Inside of each role folder, there is a subset of folders for the following purposes:
+
+- `tasks`: Contains the tasks which do the actual work.
+- `handlers`: Contains handlers, which, when notified, trigger actions.
+- `defaults`: Role specific variables, which have a default, but are intended to get overridden from the role user (a play in a playbook).
+- `vars`: Role specific variables, which are not intended to get overridden.
+- `templates`: The default directory for jinja2 templated files. The [template module](http://www.markusz.io/posts/2017/11/24/ansible-playbook-roles/#templatemod) searches in that directory.
+- `files`: The default directory for static files used by the [copy module](http://www.markusz.io/posts/2017/11/24/ansible-playbook-roles/#copymod).
+- `meta`: Meta information for this role. This is the place where you can define dependencies to other roles, for example.
+- `tests`: Contains everything necessary to test this role in isolation. I haven’t yet used this like I should. I’m going to explore this in another post later.
+
+Finally, there are main files grouping roles by type. Those files are:
+- `devops.yml`: groups the roles needed to be applied in the configuration for a DevOps role
+## Run the playbooks
+
+Now that the setup is done in both sides, let's check that the desired host(s) can be reached to be configured.
+
+First thing to do is set the credentials at `hosts` file. You need to set `ansible_user` and `ansible_password` at the `<machine>:vars`. Done that, run the following:
+
+```
+$ ansible -i hosts.yml locahost -m win_ping
+```
+
+This should return the following:
+
+```
+<machine_ip> | SUCCESS => {
+    "changed": false,
+    "invocation": {
+        "module_args": {
+            "data": "pong"
+        }
+    },
+    "ping": "pong"
+}
+```
+
+### Test the playbook(s)
+
+At this point, we have to Run the whole playbook(s) in `dry-run` mode. It is *MANDATORY* to run this command prior to applying any change in the server, to avoid configuration drifts and/or issues. This command runs the playbook in "simulation mode", and returns the result without applying any change.
+
+> **IMPORTANT** Since now on we have encrypted variables in the repo, we need to run all the playbooks with the flag `--ask-vault-pass`.
+
+```
+ansible-playbook -i hosts.yml localhost devops.yml --check
+```
+
+### Run the playbook(s)
+
+Once the configuration is tested and everything works as expected, apply the configuration:
+
+```
+ansible-playbook -i hosts.yml localhost devops.yml
+```
+
+## Troubleshooting and resources
+
+- [Ansible Windows remote management guide](https://docs.ansible.com/ansible/latest/user_guide/windows_winrm.html)
+- [Understanding and troubleshooting WinRM connection and authentication: a thrill seeker's guide to adventure](http://www.hurryupandwait.io/blog/understanding-and-troubleshooting-winrm-connection-and-authentication-a-thrill-seekers-guide-to-adventure)  --> HIGHLY RECOMMENDED
+- [setting-up-wsl-ansible-to-control-windows-host](https://github.com/hclpandv/setting-up-wsl-ansible-to-control-windows-host)
+- [Configure your dev Windows machine with Ansible](https://dev.to/gmarokov/configure-your-dev-windows-machine-with-ansible-41aj)
+- [Ansible playbook: Post Windows installation](https://github.com/gmarokov/ansible-playbook-postinstall-win)
+- [win_feature – Installs and uninstalls Windows Features on Windows Server](https://docs.ansible.com/ansible/latest/modules/win_feature_module.html)
+- [win_chocolatey – Manage packages using chocolatey](https://docs.ansible.com/ansible/latest/modules/win_chocolatey_module.html)
+- [Desired State Configuration](https://docs.ansible.com/ansible/latest/user_guide/windows_dsc.html)
+- [Windows Modules](https://docs.ansible.com/ansible/latest/index.html#stq=win_&stp=1)
+- [win_optional_feature – Manage optional Windows features](https://docs.ansible.com/ansible/latest/modules/win_optional_feature_module.html)
+- [Best Practices](https://docs.ansible.com/ansible/latest/user_guide/playbooks_best_practices.html)
 
 # Contributing
 
@@ -40,9 +171,8 @@ Please see our [Contribution Guide](CONTRIBUTING.md) to learn how to contribute.
 
 # License
 
-[MIT](LICENSE) © {{ Year }} [ERNI - Swiss Software Engineering](https://www.betterask.erni)
+[MIT](LICENSE) © 2021 [ERNI - Swiss Software Engineering](https://www.betterask.erni)
 
 **Contact:** 
 
-{{ Your Name}}  - [@your_twitter](https://twitter.com/your_username) - your_mail
-@example.com
+Alberto Martín  - [@albertinisg](https://twitter.com/albertinisg) - alberto.mcasado@erni-espana.es
