@@ -1,29 +1,38 @@
 # starterkit-devops-ansible-playbooks
+
 Post Windows installation playbooks for different Windows environments.
 
+<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+<!-- ALL-CONTRIBUTORS-BADGE:END -->
+
 ## Built With
+
 The main tools this repository will use are:
 
 - [Ansible](https://docs.ansible.com), a tool that connects to the Windows machines using winRM protocol
 - [WSL](https://docs.microsoft.com/en-us/windows/wsl/install-win10), as Ansible just works in Unix machines
 - [Chocolatey](https://chocolatey.org), a Windows package manager.
 
-# Features
+## Features
+
 - Ansible is a tool that manages the configuration of any host/server. It also handles states, so once a machine is configured using Ansible, any software and/or configuration MUST BE done through the playbook process (even configuration and/or application removal). This allows to have every transaction in the git repository, and avoids configuration drifts.
 - Will speed-up the ramp-up role for your project
 
-# Getting Started
+## Getting Started
+
 In the following section you will find out how to setup your enviroment so that later on you are able to clone this repository and run your playbooks.
 
 ## Prerequisites
-Ansible works also under Windows Subsystem for Linux (WSL). Follow this guide to install it in Windows 10: https://docs.microsoft.com/en-us/windows/wsl/install-win10
+
+Ansible works also under Windows Subsystem for Linux (WSL). Follow this guide to install it in Windows 10: <https://docs.microsoft.com/en-us/windows/wsl/install-win10>
 
 ## Installation
 
 ### Prepare the host where to run the Playbook
 
 In both hosts the approach is the same but it uses different commands. Requirements are:
-- python3 
+
+- python3
 
 #### Debian 10 WSL
 
@@ -51,6 +60,7 @@ Make sure Ansible is installed by running:
 ```
 ansible --version
 ```
+
 ### Prepare a Windows host to apply the recipe locally from WSL
 
 To enable your Windows environment to be configured locally by using Ansible from WSL, you will need to follow the next steps:
@@ -61,11 +71,13 @@ iex ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercon
 # Enable WsMan
 Enable-WSManCredSSP -Role Server -Force
 ```
+
 After that, you should be able to connect from your WSL by using `localhost`
 
 ## Structure
 
 The playbooks are organized as follows:
+
 ```
 ├── roles
 │   ├── packages
@@ -93,7 +105,9 @@ The playbooks are organized as follows:
 └── README.md
 
 ```
+
 There is 1 main folder, and sub-groups inside it:
+
 - `roles`: where tasks and variables related to the group of tasks are defined.
 
 Inside of each role folder, there is a subset of folders for the following purposes:
@@ -108,7 +122,9 @@ Inside of each role folder, there is a subset of folders for the following purpo
 - `tests`: Contains everything necessary to test this role in isolation. I haven’t yet used this like I should. I’m going to explore this in another post later.
 
 Finally, there are main files grouping roles by type. Those files are:
+
 - `devops.yml`: groups the roles needed to be applied in the configuration for a DevOps role
+
 ## Run the playbooks
 
 Now that the setup is done in both sides, let's check that the desired host(s) can be reached to be configured.
@@ -116,7 +132,7 @@ Now that the setup is done in both sides, let's check that the desired host(s) c
 First thing to do is set the credentials at `hosts` file. You need to set `ansible_user` and `ansible_password` at the `<machine>:vars`. Done that, run the following:
 
 ```
-$ ansible -i hosts.yml locahost -m win_ping
+ansible -i hosts.yml locahost -m win_ping
 ```
 
 This should return the following:
@@ -165,14 +181,41 @@ ansible-playbook -i hosts.yml localhost devops.yml
 - [win_optional_feature – Manage optional Windows features](https://docs.ansible.com/ansible/latest/modules/win_optional_feature_module.html)
 - [Best Practices](https://docs.ansible.com/ansible/latest/user_guide/playbooks_best_practices.html)
 
-# Contributing
+## Contributing
 
 Please see our [Contribution Guide](CONTRIBUTING.md) to learn how to contribute.
 
-# License
+## License
 
-[MIT](LICENSE) © 2021 [ERNI - Swiss Software Engineering](https://www.betterask.erni)
+![MIT](https://img.shields.io/badge/License-MIT-blue.svg)
 
-**Contact:** 
+(LICENSE) © 2022 [ERNI - Swiss Software Engineering](https://www.betterask.erni)
+
+## Code of conduct
+
+Please see our [Code of Conduct](CODE_OF_CONDUCT.md)
+
+## Stats
+
+![https://repobeats.axiom.co/api/embed/6d0c51994bd8584be9d34473b53945b99ab65e23.svg](https://repobeats.axiom.co/api/embed/6d0c51994bd8584be9d34473b53945b99ab65e23.svg)
+
+## Follow us
+
+[![Twitter Follow](https://img.shields.io/twitter/follow/ERNI?style=social)](https://www.twitter.com/ERNI)
+[![Twitch Status](https://img.shields.io/twitch/status/erni_academy?label=Twitch%20Erni%20Academy&style=social)](https://www.twitch.tv/erni_academy)
+[![YouTube Channel Views](https://img.shields.io/youtube/channel/views/UCkdDcxjml85-Ydn7Dc577WQ?label=Youtube%20Erni%20Academy&style=social)](https://www.youtube.com/channel/UCkdDcxjml85-Ydn7Dc577WQ)
+[![Linkedin](https://img.shields.io/badge/linkedin-31k-green?style=social&logo=Linkedin)](https://www.linkedin.com/company/erni)
+
+## Contact
+
+📧 [esp-services@betterask.erni](mailto:esp-services@betterask.erni)
 
 Alberto Martín  - [@albertinisg](https://twitter.com/albertinisg) - alberto.mcasado@erni-espana.es
+
+## Contributors ✨
+
+Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
+
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- ALL-CONTRIBUTORS-LIST:END -->
+This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
