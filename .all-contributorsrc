@@ -10,24 +10,5 @@
   "repoHost": "https://github.com",
   "skipCi": true,
   "badgeTemplate": "[![All Contributors](https://img.shields.io/badge/all_contributors-<%= contributors.length %>-orange.svg?style=flat-square)](#contributors)",
-  "contributors": [
-    {
-      "login": "albertinisg",
-      "name": "Alberto Martín",
-      "avatar_url": "https://avatars.githubusercontent.com/u/8257425?v=4",
-      "profile": "https://github.com/albertinisg",
-      "contributions": [
-        "code",
-        "content",
-        "doc",
-        "design",
-        "ideas",
-        "maintenance",
-        "test",
-        "example",
-        "review"
-      ]
-    }
-  ],
-  "projectName": "starterkit-devops-ansible-playbooks"
+  "contributors": []
 }
